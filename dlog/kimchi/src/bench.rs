@@ -95,16 +95,14 @@ pub fn proof(num: usize) {
         };
 
         // add the proof to the batch
-        let mut batch = Vec::new();
-        batch.push(
-            ProverProof::create::<BaseSponge, ScalarSponge>(
-                &group_map,
-                witness,
-                &index,
-                vec![prev],
-            )
-            .unwrap(),
-        );
+        let proof = ProverProof::create::<BaseSponge, ScalarSponge>(
+            &group_map,
+            witness,
+            &index,
+            vec![prev],
+        )
+        .unwrap();
+        let batch = vec![proof];
 
         // verify the proof
         let verifier_index = index.verifier_index();
