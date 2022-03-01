@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["fp",""],["fp5",""],["fp_3",""],["fq",""],["fq5",""],["fq_3",""]]});
+initSidebarItems({"mod":[["fp",""],["fq",""]]});

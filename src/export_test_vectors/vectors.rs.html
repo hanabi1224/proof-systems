@@ -113,10 +113,6 @@
 <span id="108">108</span>
 <span id="109">109</span>
 <span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Mode</span>;
 <span class="kw">use</span> <span class="ident">ark_ff</span>::{<span class="ident">fields::PrimeField</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">UniformRand</span> <span class="kw">as</span> <span class="kw">_</span>};
 <span class="kw">use</span> <span class="ident">ark_serialize::CanonicalSerialize</span> <span class="kw">as</span> <span class="kw">_</span>;
@@ -132,14 +128,12 @@
 <span class="comment">// generate different test vectors depending on features</span>
 <span class="comment">//</span>
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;3w&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">oracle</span>::{<span class="ident">pasta::fp</span> <span class="kw">as</span> <span class="ident">Parameters</span>, <span class="ident">poseidon::PlonkSpongeConstantsBasic</span>};
+<span class="kw">use</span> <span class="ident">oracle::pasta::fp</span> <span class="kw">as</span> <span class="ident">SpongeParameters</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;basic&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;15w&quot;</span>)))]</span>
+<span class="kw">use</span> <span class="ident">oracle::poseidon::PlonkSpongeConstantsBasic</span> <span class="kw">as</span> <span class="ident">PlonkSpongeConstants</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;5w&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">oracle</span>::{<span class="ident">pasta::fp5</span> <span class="kw">as</span> <span class="ident">Parameters</span>, <span class="ident">poseidon::PlonkSpongeConstants5W</span> <span class="kw">as</span> <span class="ident">PlonkSpongeConstants</span>};
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;3&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">oracle</span>::{<span class="ident">pasta::fp_3</span> <span class="kw">as</span> <span class="ident">Parameters</span>, <span class="ident">poseidon::PlonkSpongeConstants3W</span> <span class="kw">as</span> <span class="ident">PlonkSpongeConstants</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;15w&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">oracle::poseidon::PlonkSpongeConstants15W</span> <span class="kw">as</span> <span class="ident">PlonkSpongeConstants</span>;
 
 <span class="comment">//</span>
 <span class="comment">// structs</span>
@@ -164,7 +158,7 @@
 <span class="doccomment">/// Computes the poseidon hash of several field elements.</span>
 <span class="doccomment">/// Uses the &#39;basic&#39; configuration with N states and M rounds.</span>
 <span class="kw">fn</span> <span class="ident">poseidon</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">Fp</span>]) -&gt; <span class="ident">Fp</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">Poseidon</span>::<span class="op">&lt;</span><span class="ident">Fp</span>, <span class="ident">PlonkSpongeConstantsBasic</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">Parameters::params</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">Poseidon</span>::<span class="op">&lt;</span><span class="ident">Fp</span>, <span class="ident">PlonkSpongeConstants</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">SpongeParameters::params</span>());
     <span class="ident">s</span>.<span class="ident">absorb</span>(<span class="ident">input</span>);
 
     <span class="ident">s</span>.<span class="ident">squeeze</span>()
@@ -218,12 +212,10 @@
         })
     }
 
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;3w&quot;</span>) {
-        <span class="string">&quot;3w&quot;</span>.<span class="ident">to_string</span>()
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;3&quot;</span>) {
-        <span class="string">&quot;3&quot;</span>.<span class="ident">to_string</span>()
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;5w&quot;</span>) {
-        <span class="string">&quot;5w&quot;</span>.<span class="ident">to_string</span>()
+    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;basic&quot;</span>) {
+        <span class="string">&quot;basic&quot;</span>.<span class="ident">to_string</span>()
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;15w&quot;</span>) {
+        <span class="string">&quot;15w&quot;</span>.<span class="ident">to_string</span>()
     } <span class="kw">else</span> {
         <span class="macro">panic!</span>(<span class="string">&quot;test vector feature not recognized&quot;</span>);
     };
@@ -232,5 +224,5 @@
     <span class="ident">TestVectors</span> { <span class="ident">name</span>, <span class="ident">test_vectors</span> }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="export_test_vectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (6a7055661 2022-02-27)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="export_test_vectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
 </body></html>

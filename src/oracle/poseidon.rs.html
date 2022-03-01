@@ -271,36 +271,6 @@
 <span id="266">266</span>
 <span id="267">267</span>
 <span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module implements Poseidon Hash Function primitive</span>
 
 <span class="kw">use</span> <span class="ident">ark_ff::Field</span>;
@@ -332,36 +302,6 @@
     <span class="kw">const</span> <span class="ident">SPONGE_BOX</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">5</span>;
     <span class="kw">const</span> <span class="ident">FULL_MDS</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">true</span>;
     <span class="kw">const</span> <span class="ident">INITIAL_ARK</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">true</span>;
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PlonkSpongeConstants5W</span> {}
-
-<span class="kw">impl</span> <span class="ident">SpongeConstants</span> <span class="kw">for</span> <span class="ident">PlonkSpongeConstants5W</span> {
-    <span class="kw">const</span> <span class="ident">ROUNDS_FULL</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">53</span>;
-    <span class="kw">const</span> <span class="ident">ROUNDS_PARTIAL</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">HALF_ROUNDS_FULL</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">SPONGE_CAPACITY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">const</span> <span class="ident">SPONGE_WIDTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">5</span>;
-    <span class="kw">const</span> <span class="ident">SPONGE_RATE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
-    <span class="kw">const</span> <span class="ident">SPONGE_BOX</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">7</span>;
-    <span class="kw">const</span> <span class="ident">FULL_MDS</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">true</span>;
-    <span class="kw">const</span> <span class="ident">INITIAL_ARK</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PlonkSpongeConstants3W</span> {}
-
-<span class="kw">impl</span> <span class="ident">SpongeConstants</span> <span class="kw">for</span> <span class="ident">PlonkSpongeConstants3W</span> {
-    <span class="kw">const</span> <span class="ident">ROUNDS_FULL</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">54</span>;
-    <span class="kw">const</span> <span class="ident">ROUNDS_PARTIAL</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">HALF_ROUNDS_FULL</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">SPONGE_CAPACITY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">const</span> <span class="ident">SPONGE_WIDTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3</span>;
-    <span class="kw">const</span> <span class="ident">SPONGE_RATE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
-    <span class="kw">const</span> <span class="ident">SPONGE_BOX</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">7</span>;
-    <span class="kw">const</span> <span class="ident">FULL_MDS</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">true</span>;
-    <span class="kw">const</span> <span class="ident">INITIAL_ARK</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
@@ -600,5 +540,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="oracle" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (6a7055661 2022-02-27)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="oracle" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
 </body></html>

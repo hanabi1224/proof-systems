@@ -10,5 +10,5 @@ sourcesIndex["mina_signer"] = {"name":"","files":["keypair.rs","lib.rs","pubkey.
 sourcesIndex["o1_utils"] = {"name":"","files":["dense_polynomial.rs","evaluations.rs","field_helpers.rs","hasher.rs","lib.rs","serialization.rs"]};
 sourcesIndex["ocaml_derive"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["ocaml_gen"] = {"name":"","files":["conv.rs","lib.rs"]};
-sourcesIndex["oracle"] = {"name":"","dirs":[{"name":"pasta","files":["fp.rs","fp5.rs","fp_3.rs","fq.rs","fq5.rs","fq_3.rs","mod.rs"]}],"files":["lib.rs","poseidon.rs","sponge.rs"]};
+sourcesIndex["oracle"] = {"name":"","dirs":[{"name":"pasta","files":["fp.rs","fq.rs","mod.rs"]}],"files":["lib.rs","poseidon.rs","sponge.rs"]};
 createSourceSidebar();
