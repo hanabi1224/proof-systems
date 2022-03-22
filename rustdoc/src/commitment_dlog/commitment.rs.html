@@ -1139,40 +1139,6 @@
 <span id="1134">1134</span>
 <span id="1135">1135</span>
 <span id="1136">1136</span>
-<span id="1137">1137</span>
-<span id="1138">1138</span>
-<span id="1139">1139</span>
-<span id="1140">1140</span>
-<span id="1141">1141</span>
-<span id="1142">1142</span>
-<span id="1143">1143</span>
-<span id="1144">1144</span>
-<span id="1145">1145</span>
-<span id="1146">1146</span>
-<span id="1147">1147</span>
-<span id="1148">1148</span>
-<span id="1149">1149</span>
-<span id="1150">1150</span>
-<span id="1151">1151</span>
-<span id="1152">1152</span>
-<span id="1153">1153</span>
-<span id="1154">1154</span>
-<span id="1155">1155</span>
-<span id="1156">1156</span>
-<span id="1157">1157</span>
-<span id="1158">1158</span>
-<span id="1159">1159</span>
-<span id="1160">1160</span>
-<span id="1161">1161</span>
-<span id="1162">1162</span>
-<span id="1163">1163</span>
-<span id="1164">1164</span>
-<span id="1165">1165</span>
-<span id="1166">1166</span>
-<span id="1167">1167</span>
-<span id="1168">1168</span>
-<span id="1169">1169</span>
-<span id="1170">1170</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module implements Dlog-based polynomial commitment schema.</span>
 <span class="doccomment">//! The folowing functionality is implemented</span>
 <span class="doccomment">//!</span>
@@ -1196,6 +1162,8 @@
 <span class="kw">use</span> <span class="ident">ark_serialize</span>::{<span class="ident">CanonicalDeserialize</span>, <span class="ident">CanonicalSerialize</span>};
 <span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Add</span>, <span class="ident">Sub</span>};
 <span class="kw">use</span> <span class="ident">groupmap</span>::{<span class="ident">BWParameters</span>, <span class="ident">GroupMap</span>};
+<span class="kw">use</span> <span class="ident">o1_utils::math</span>;
+<span class="kw">use</span> <span class="ident">o1_utils::types::fields</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">o1_utils::ExtendedDensePolynomial</span> <span class="kw">as</span> <span class="kw">_</span>;
 <span class="kw">use</span> <span class="ident">oracle</span>::{<span class="ident">sponge::ScalarChallenge</span>, <span class="ident">FqSponge</span>};
 <span class="kw">use</span> <span class="ident">rand_core</span>::{<span class="ident">CryptoRng</span>, <span class="ident">RngCore</span>};
@@ -1205,9 +1173,6 @@
 <span class="kw">use</span> <span class="ident">std::iter::Iterator</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::evaluation_proof</span>::<span class="kw-2">*</span>;
-
-<span class="kw">type</span> <span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">G</span> <span class="kw">as</span> <span class="ident">AffineCurve</span><span class="op">&gt;</span><span class="ident">::ScalarField</span>;
-<span class="kw">type</span> <span class="ident">Fq</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">G</span> <span class="kw">as</span> <span class="ident">AffineCurve</span><span class="op">&gt;</span><span class="ident">::BaseField</span>;
 
 <span class="doccomment">/// A polynomial commitment.</span>
 <span class="attribute">#[<span class="ident">serde_as</span>]</span>
@@ -1439,22 +1404,6 @@
     <span class="ident">s</span>
 }
 
-<span class="comment">// TODO: move to utils</span>
-<span class="doccomment">/// Returns ceil(log2(d)) but panics if d = 0.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ceil_log2</span>(<span class="ident">d</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-    <span class="macro">assert!</span>(<span class="ident">d</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pow2</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ceil_log2</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">while</span> <span class="ident">d</span> <span class="op">&gt;</span> <span class="ident">pow2</span> {
-        <span class="ident">ceil_log2</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">pow2</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">pow2</span>.<span class="ident">checked_mul</span>(<span class="number">2</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
-        }
-    }
-    <span class="ident">ceil_log2</span>
-}
-
 <span class="doccomment">/// `pows(d, x)` returns a vector containing the first `d` powers of the field element `x` (from `1` to `x^(d-1)`).</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pows</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Field</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="ident">usize</span>, <span class="ident">x</span>: <span class="ident">F</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">acc</span> <span class="op">=</span> <span class="ident">F::one</span>();
@@ -1572,15 +1521,15 @@
 <span class="doccomment">/// the evaluation for the last segment is potentially shifted to meet the proof.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">combined_inner_product</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">CommitmentCurve</span><span class="op">&gt;</span>(
-    <span class="ident">evaluation_points</span>: <span class="kw-2">&amp;</span>[<span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>],
-    <span class="ident">xi</span>: <span class="kw-2">&amp;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
-    <span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
+    <span class="ident">evaluation_points</span>: <span class="kw-2">&amp;</span>[<span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>],
+    <span class="ident">xi</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
+    <span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
     <span class="comment">// TODO(mimoo): needs a type that can get you evaluations or segments</span>
-    <span class="ident">polys</span>: <span class="kw-2">&amp;</span>[(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>)],
+    <span class="ident">polys</span>: <span class="kw-2">&amp;</span>[(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>)],
     <span class="ident">srs_length</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Fr</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::zero</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">xi_i</span> <span class="op">=</span> <span class="ident">Fr</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::one</span>();
+) -&gt; <span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::zero</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">xi_i</span> <span class="op">=</span> <span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::one</span>();
 
     <span class="kw">for</span> (<span class="ident">evals_tr</span>, <span class="ident">shifted</span>) <span class="kw">in</span> <span class="ident">polys</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">evals_tr</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">evals_tr</span>[<span class="number">0</span>].<span class="ident">is_empty</span>()) {
         <span class="comment">// transpose the evaluations</span>
@@ -1590,7 +1539,7 @@
 
         <span class="comment">// iterating over the polynomial segments</span>
         <span class="kw">for</span> <span class="ident">eval</span> <span class="kw">in</span> <span class="ident">evals</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">term</span> <span class="op">=</span> <span class="ident">DensePolynomial</span>::<span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::eval_polynomial</span>(<span class="ident">eval</span>, <span class="kw-2">*</span><span class="ident">r</span>);
+            <span class="kw">let</span> <span class="ident">term</span> <span class="op">=</span> <span class="ident">DensePolynomial</span>::<span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::eval_polynomial</span>(<span class="ident">eval</span>, <span class="kw-2">*</span><span class="ident">r</span>);
 
             <span class="ident">res</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="ident">xi_i</span> <span class="op">*</span> <span class="ident">term</span>);
             <span class="ident">xi_i</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">xi</span>;
@@ -1599,7 +1548,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">shifted</span> {
             <span class="comment">// xi^i sum_j r^j elm_j^{N - m} f(elm_j)</span>
             <span class="kw">let</span> <span class="ident">last_evals</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">m</span> <span class="op">&gt;</span> <span class="ident">evals</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">srs_length</span> {
-                <span class="macro">vec!</span>[<span class="ident">Fr</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::zero</span>(); <span class="ident">evaluation_points</span>.<span class="ident">len</span>()]
+                <span class="macro">vec!</span>[<span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::zero</span>(); <span class="ident">evaluation_points</span>.<span class="ident">len</span>()]
             } <span class="kw">else</span> {
                 <span class="ident">evals</span>[<span class="ident">evals</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>].<span class="ident">clone</span>()
             };
@@ -1609,7 +1558,7 @@
                 .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">elm</span>, <span class="ident">f_elm</span>)<span class="op">|</span> <span class="ident">elm</span>.<span class="ident">pow</span>(<span class="kw-2">&amp;</span>[(<span class="ident">srs_length</span> <span class="op">-</span> (<span class="kw-2">*</span><span class="ident">m</span>) <span class="op">%</span> <span class="ident">srs_length</span>) <span class="kw">as</span> <span class="ident">u64</span>]) <span class="op">*</span> <span class="ident">f_elm</span>)
                 .<span class="ident">collect</span>();
 
-            <span class="ident">res</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="ident">xi_i</span> <span class="op">*</span> <span class="ident">DensePolynomial</span>::<span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::eval_polynomial</span>(<span class="kw-2">&amp;</span><span class="ident">shifted_evals</span>, <span class="kw-2">*</span><span class="ident">r</span>));
+            <span class="ident">res</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="ident">xi_i</span> <span class="op">*</span> <span class="ident">DensePolynomial</span>::<span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::eval_polynomial</span>(<span class="kw-2">&amp;</span><span class="ident">shifted_evals</span>, <span class="kw-2">*</span><span class="ident">r</span>));
             <span class="ident">xi_i</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">xi</span>;
         }
     }
@@ -1684,7 +1633,7 @@
     <span class="kw">pub</span> <span class="ident">commitment</span>: <span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Contains an evaluation table</span>
-    <span class="kw">pub</span> <span class="ident">evaluations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">evaluations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// optional degree bound</span>
     <span class="kw">pub</span> <span class="ident">degree_bound</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
@@ -1695,16 +1644,16 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BatchEvaluationProof</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span>, <span class="ident">EFqSponge</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">G</span>: <span class="ident">AffineCurve</span>,
-    <span class="ident">EFqSponge</span>: <span class="ident">FqSponge</span><span class="op">&lt;</span><span class="ident">Fq</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">G</span>, <span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">EFqSponge</span>: <span class="ident">FqSponge</span><span class="op">&lt;</span><span class="ident">BaseField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">G</span>, <span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 {
     <span class="kw">pub</span> <span class="ident">sponge</span>: <span class="ident">EFqSponge</span>,
     <span class="kw">pub</span> <span class="ident">evaluations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Evaluation</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// vector of evaluation points</span>
-    <span class="kw">pub</span> <span class="ident">evaluation_points</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">evaluation_points</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// scaling factor for evaluation point powers</span>
-    <span class="kw">pub</span> <span class="ident">xi</span>: <span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">xi</span>: <span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
     <span class="doccomment">/// scaling factor for polynomials</span>
-    <span class="kw">pub</span> <span class="ident">r</span>: <span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">r</span>: <span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
     <span class="doccomment">/// batched opening proof</span>
     <span class="kw">pub</span> <span class="ident">opening</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OpeningProof</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
 }
@@ -1713,10 +1662,10 @@
     <span class="doccomment">/// Commits a polynomial, potentially splitting the result in multiple commitments.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commit</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">plnm</span>: <span class="kw-2">&amp;</span><span class="ident">DensePolynomial</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">plnm</span>: <span class="kw-2">&amp;</span><span class="ident">DensePolynomial</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">max</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
         <span class="ident">rng</span>: <span class="kw-2">&amp;mut</span> (<span class="kw">impl</span> <span class="ident">RngCore</span> <span class="op">+</span> <span class="ident">CryptoRng</span>),
-    ) -&gt; (<span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    ) -&gt; (<span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">mask</span>(<span class="self">self</span>.<span class="ident">commit_non_hiding</span>(<span class="ident">plnm</span>, <span class="ident">max</span>), <span class="ident">rng</span>)
     }
 
@@ -1725,14 +1674,14 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">c</span>: <span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
         <span class="ident">rng</span>: <span class="kw-2">&amp;mut</span> (<span class="kw">impl</span> <span class="ident">RngCore</span> <span class="op">+</span> <span class="ident">CryptoRng</span>),
-    ) -&gt; (<span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    ) -&gt; (<span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="ident">c</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span>: <span class="ident">G</span><span class="op">|</span> {
             <span class="kw">if</span> <span class="ident">g</span>.<span class="ident">is_zero</span>() {
                 <span class="comment">// TODO: This leaks information when g is the identity!</span>
                 <span class="comment">// We should change this so that we still mask in this case</span>
-                (<span class="ident">g</span>, <span class="ident">Fr</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::zero</span>())
+                (<span class="ident">g</span>, <span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::zero</span>())
             } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">w</span> <span class="op">=</span> <span class="ident">Fr</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::rand</span>(<span class="ident">rng</span>);
+                <span class="kw">let</span> <span class="ident">w</span> <span class="op">=</span> <span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::rand</span>(<span class="ident">rng</span>);
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g_masked</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">h</span>.<span class="ident">mul</span>(<span class="ident">w</span>);
                 <span class="ident">g_masked</span>.<span class="ident">add_assign_mixed</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>);
                 (<span class="ident">g_masked</span>.<span class="ident">into_affine</span>(), <span class="ident">w</span>)
@@ -1749,14 +1698,14 @@
     <span class="doccomment">/// Note that a maximum degree cannot (and doesn&#39;t need to) be enforced via a shift if `max` is a multiple of `n`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commit_non_hiding</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">plnm</span>: <span class="kw-2">&amp;</span><span class="ident">DensePolynomial</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">plnm</span>: <span class="kw-2">&amp;</span><span class="ident">DensePolynomial</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">max</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::commit_helper</span>(<span class="kw-2">&amp;</span><span class="ident">plnm</span>.<span class="ident">coeffs</span>[..], <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">g</span>[..], <span class="prelude-val">None</span>, <span class="ident">plnm</span>.<span class="ident">is_zero</span>(), <span class="ident">max</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commit_helper</span>(
-        <span class="ident">scalars</span>: <span class="kw-2">&amp;</span>[<span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>],
+        <span class="ident">scalars</span>: <span class="kw-2">&amp;</span>[<span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>],
         <span class="ident">basis</span>: <span class="kw-2">&amp;</span>[<span class="ident">G</span>],
         <span class="ident">n</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
         <span class="ident">is_zero</span>: <span class="ident">bool</span>,
@@ -1815,8 +1764,8 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commit_evaluations_non_hiding</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">domain</span>: <span class="ident">D</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">plnm</span>: <span class="kw-2">&amp;</span><span class="ident">Evaluations</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">D</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">domain</span>: <span class="ident">D</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">plnm</span>: <span class="kw-2">&amp;</span><span class="ident">Evaluations</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">D</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">max</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">is_zero</span> <span class="op">=</span> <span class="ident">plnm</span>.<span class="ident">evals</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">is_zero</span>());
@@ -1843,11 +1792,11 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commit_evaluations</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">domain</span>: <span class="ident">D</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">plnm</span>: <span class="kw-2">&amp;</span><span class="ident">Evaluations</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">D</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">domain</span>: <span class="ident">D</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">plnm</span>: <span class="kw-2">&amp;</span><span class="ident">Evaluations</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">D</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">max</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
         <span class="ident">rng</span>: <span class="kw-2">&amp;mut</span> (<span class="kw">impl</span> <span class="ident">RngCore</span> <span class="op">+</span> <span class="ident">CryptoRng</span>),
-    ) -&gt; (<span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    ) -&gt; (<span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">mask</span>(<span class="self">self</span>.<span class="ident">commit_evaluations_non_hiding</span>(<span class="ident">domain</span>, <span class="ident">plnm</span>, <span class="ident">max</span>), <span class="ident">rng</span>)
     }
 
@@ -1869,7 +1818,7 @@
         <span class="ident">rng</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RNG</span>,
     ) -&gt; <span class="ident">bool</span>
     <span class="kw">where</span>
-        <span class="ident">EFqSponge</span>: <span class="ident">FqSponge</span><span class="op">&lt;</span><span class="ident">Fq</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">G</span>, <span class="ident">Fr</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">EFqSponge</span>: <span class="ident">FqSponge</span><span class="op">&lt;</span><span class="ident">BaseField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">G</span>, <span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">RNG</span>: <span class="ident">RngCore</span> <span class="op">+</span> <span class="ident">CryptoRng</span>,
         <span class="ident">G::BaseField</span>: <span class="ident">PrimeField</span>,
     {
@@ -1895,7 +1844,7 @@
 
         <span class="kw">let</span> <span class="ident">nonzero_length</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">g</span>.<span class="ident">len</span>();
 
-        <span class="kw">let</span> <span class="ident">max_rounds</span> <span class="op">=</span> <span class="ident">ceil_log2</span>(<span class="ident">nonzero_length</span>);
+        <span class="kw">let</span> <span class="ident">max_rounds</span> <span class="op">=</span> <span class="ident">math::ceil_log2</span>(<span class="ident">nonzero_length</span>);
 
         <span class="kw">let</span> <span class="ident">padded_length</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">max_rounds</span>;
 
@@ -1905,15 +1854,15 @@
         <span class="ident">points</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">g</span>.<span class="ident">clone</span>());
         <span class="ident">points</span>.<span class="ident">extend</span>(<span class="macro">vec!</span>[<span class="ident">G::zero</span>(); <span class="ident">padding</span>]);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scalars</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">Fr</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::zero</span>(); <span class="ident">padded_length</span> <span class="op">+</span> <span class="number">1</span>];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scalars</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::zero</span>(); <span class="ident">padded_length</span> <span class="op">+</span> <span class="number">1</span>];
         <span class="macro">assert_eq!</span>(<span class="ident">scalars</span>.<span class="ident">len</span>(), <span class="ident">points</span>.<span class="ident">len</span>());
 
         <span class="comment">// sample randomiser to scale the proofs with</span>
-        <span class="kw">let</span> <span class="ident">rand_base</span> <span class="op">=</span> <span class="ident">Fr</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::rand</span>(<span class="ident">rng</span>);
-        <span class="kw">let</span> <span class="ident">sg_rand_base</span> <span class="op">=</span> <span class="ident">Fr</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::rand</span>(<span class="ident">rng</span>);
+        <span class="kw">let</span> <span class="ident">rand_base</span> <span class="op">=</span> <span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::rand</span>(<span class="ident">rng</span>);
+        <span class="kw">let</span> <span class="ident">sg_rand_base</span> <span class="op">=</span> <span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::rand</span>(<span class="ident">rng</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rand_base_i</span> <span class="op">=</span> <span class="ident">Fr</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::one</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sg_rand_base_i</span> <span class="op">=</span> <span class="ident">Fr</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::one</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rand_base_i</span> <span class="op">=</span> <span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::one</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sg_rand_base_i</span> <span class="op">=</span> <span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::one</span>();
 
         <span class="kw">for</span> <span class="ident">BatchEvaluationProof</span> {
             <span class="ident">sponge</span>,
@@ -1965,8 +1914,8 @@
             <span class="comment">// ==</span>
             <span class="comment">// sum_i r^i &lt; s, pows(evaluation_point[i]) &gt;</span>
             <span class="kw">let</span> <span class="ident">b0</span> <span class="op">=</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scale</span> <span class="op">=</span> <span class="ident">Fr</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::one</span>();
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Fr</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::zero</span>();
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scale</span> <span class="op">=</span> <span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::one</span>();
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::zero</span>();
                 <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">e</span> <span class="kw">in</span> <span class="ident">evaluation_points</span>.<span class="ident">iter</span>() {
                     <span class="kw">let</span> <span class="ident">term</span> <span class="op">=</span> <span class="ident">b_poly</span>(<span class="kw-2">&amp;</span><span class="ident">chal</span>, <span class="ident">e</span>);
                     <span class="ident">res</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="ident">scale</span> <span class="op">*</span> <span class="ident">term</span>);
@@ -2028,7 +1977,7 @@
             <span class="comment">// == sum_j sum_i r^j xi^i f_i(elm_j)</span>
             <span class="comment">// == sum_i xi^i sum_j r^j f_i(elm_j)</span>
             {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">xi_i</span> <span class="op">=</span> <span class="ident">Fr</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::one</span>();
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">xi_i</span> <span class="op">=</span> <span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::one</span>();
 
                 <span class="kw">for</span> <span class="ident">Evaluation</span> {
                     <span class="ident">commitment</span>,
@@ -2099,23 +2048,6 @@
     <span class="kw">use</span> <span class="ident">oracle::constants::PlonkSpongeConstantsKimchi</span> <span class="kw">as</span> <span class="ident">SC</span>;
     <span class="kw">use</span> <span class="ident">oracle</span>::{<span class="ident">pasta::fq_kimchi::params</span> <span class="kw">as</span> <span class="ident">spongeFqParams</span>, <span class="ident">sponge::DefaultFqSponge</span>};
     <span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">rngs::StdRng</span>, <span class="ident">SeedableRng</span>};
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_log2</span>() {
-        <span class="kw">let</span> <span class="ident">tests</span> <span class="op">=</span> [
-            (<span class="number">1</span>, <span class="number">0</span>),
-            (<span class="number">2</span>, <span class="number">1</span>),
-            (<span class="number">3</span>, <span class="number">2</span>),
-            (<span class="number">9</span>, <span class="number">4</span>),
-            (<span class="number">15</span>, <span class="number">4</span>),
-            (<span class="number">15430</span>, <span class="number">14</span>),
-            (<span class="ident">usize::MAX</span>, <span class="number">64</span>),
-        ];
-        <span class="kw">for</span> (<span class="ident">d</span>, <span class="ident">expected_res</span>) <span class="kw">in</span> <span class="ident">tests</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ceil_log2</span>(<span class="kw-2">*</span><span class="ident">d</span>);
-            <span class="macro">println!</span>(<span class="string">&quot;ceil(log2({})) = {}, expected = {}&quot;</span>, <span class="ident">d</span>, <span class="ident">res</span>, <span class="ident">expected_res</span>);
-        }
-    }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_lagrange_commitments</span>() {
@@ -2344,5 +2276,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="commitment_dlog" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (58f11791a 2022-03-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="commitment_dlog" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>
