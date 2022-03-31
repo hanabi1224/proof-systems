@@ -1021,7 +1021,7 @@
     }
 
     <span class="doccomment">/// Append a `Hashable` input</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_hashable</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw">impl</span> <span class="ident">Hashable</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_hashable</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">Hashable</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">append_roinput</span>(<span class="ident">input</span>.<span class="ident">to_roinput</span>());
         <span class="self">self</span>
     }
