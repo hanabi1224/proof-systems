@@ -1257,12 +1257,17 @@
 <span id="1252">1252</span>
 <span id="1253">1253</span>
 <span id="1254">1254</span>
+<span id="1255">1255</span>
+<span id="1256">1256</span>
+<span id="1257">1257</span>
+<span id="1258">1258</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module implements prover&#39;s zk-proof primitive.</span>
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prover::permutation::ZK_ROWS</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">circuits</span>::{
         <span class="ident">argument</span>::{<span class="ident">Argument</span>, <span class="ident">ArgumentType</span>},
-        <span class="ident">constraints</span>::{<span class="ident">LookupConstraintSystem</span>, <span class="ident">ZK_ROWS</span>},
+        <span class="ident">constraints::LookupConstraintSystem</span>,
         <span class="ident">expr</span>::{<span class="ident">l0_1</span>, <span class="ident">Constants</span>, <span class="ident">Environment</span>, <span class="ident">LookupEnvironment</span>},
         <span class="ident">gate::GateType</span>,
         <span class="ident">lookup</span>::{
@@ -1423,9 +1428,9 @@
             )
             .<span class="ident">interpolate</span>()
         });
-
-        <span class="comment">//~ 10. TODO: lookup</span>
-        <span class="kw">let</span> <span class="ident">joint_combiner_</span> <span class="op">=</span> {
+        <span class="comment">//~ 10. If there&#39;s a joint lookup being used in the circuit (TODO: define joint lookup vs single lookup):</span>
+        <span class="kw">let</span> <span class="ident">joint_combiner</span>: <span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> <span class="op">=</span> {
+            <span class="comment">//~     - Sample the joint combinator (lookup challenge) $j$ with the Fq-Sponge.</span>
             <span class="comment">// TODO: how will the verifier circuit handle these kind of things? same with powers of alpha...</span>
             <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">cs</span>.<span class="ident">lookup_constraint_system</span>.<span class="ident">as_ref</span>() {
                 <span class="prelude-val">None</span>
@@ -1446,11 +1451,10 @@
                     ..
                 }) =&gt; <span class="ident">ScalarChallenge</span>(<span class="ident">fq_sponge</span>.<span class="ident">challenge</span>()),
             };
-            (<span class="ident">s</span>, <span class="ident">s</span>.<span class="ident">to_field</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>.<span class="ident">srs</span>.<span class="ident">endo_r</span>))
-        };
 
-        <span class="comment">// TODO: that seems like an unecessary line</span>
-        <span class="kw">let</span> <span class="ident">joint_combiner</span>: <span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">joint_combiner_</span>.<span class="number">1</span>;
+            <span class="comment">//~     - derive the scalar joint combinator $j$ from $j&#39;$ using the endomorphism (TODO: details, explicitly say that we change the field).</span>
+            <span class="ident">s</span>.<span class="ident">to_field</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>.<span class="ident">srs</span>.<span class="ident">endo_r</span>)
+        };
 
         <span class="kw">let</span> <span class="ident">table_id_combiner</span>: <span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> <span class="op">=</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">lcs</span>) <span class="op">=</span> <span class="ident">index</span>.<span class="ident">cs</span>.<span class="ident">lookup_constraint_system</span>.<span class="ident">as_ref</span>() {
@@ -1515,6 +1519,7 @@
             <span class="ident">CombinedEntry</span>(<span class="ident">x</span>)
         };
 
+        <span class="comment">//~ 12. If using lookup:</span>
         <span class="kw">let</span> (<span class="ident">lookup_sorted</span>, <span class="ident">lookup_sorted_coeffs</span>, <span class="ident">lookup_sorted_comm</span>, <span class="ident">lookup_sorted8</span>) <span class="op">=</span>
             <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">cs</span>.<span class="ident">lookup_constraint_system</span>.<span class="ident">as_ref</span>() {
                 <span class="prelude-val">None</span> =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
@@ -1535,11 +1540,12 @@
                                 <span class="kw-2">&amp;</span><span class="ident">joint_combiner</span>,
                                 <span class="kw-2">&amp;</span><span class="ident">table_id_combiner</span>,
                                 <span class="ident">row</span>,
-                                <span class="ident">table_id</span>,
+                                <span class="kw-2">&amp;</span><span class="ident">table_id</span>,
                             ))
                         })
                     };
 
+                    <span class="comment">//~     - Compute the sorted table.</span>
                     <span class="comment">// TODO: Once we switch to committing using lagrange commitments,</span>
                     <span class="comment">// `witness` will be consumed when we interpolate, so interpolation will</span>
                     <span class="comment">// have to moved below this.</span>
@@ -1553,6 +1559,7 @@
                             (<span class="ident">joint_combiner</span>, <span class="ident">table_id_combiner</span>),
                         )<span class="question-mark">?</span>;
 
+                    <span class="comment">//~     - Compute the sorted coefficients.</span>
                     <span class="kw">let</span> <span class="ident">lookup_sorted</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">lookup_sorted</span>
                         .<span class="ident">into_iter</span>()
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">chunk</span><span class="op">|</span> {
@@ -1561,6 +1568,8 @@
                         })
                         .<span class="ident">collect</span>();
 
+                    <span class="comment">//~     - Commit to each of the sorted table columns.</span>
+                    <span class="comment">//~       (See section on lookup to see how to compute it.)</span>
                     <span class="kw">let</span> <span class="ident">comm</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">lookup_sorted</span>
                         .<span class="ident">iter</span>()
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> {
@@ -1606,7 +1615,7 @@
                                     <span class="comment">// table ID is identically 0.</span>
                                     <span class="ident">ScalarField</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::zero</span>(),
                             };
-                        <span class="ident">combine_table_entry</span>(<span class="kw-2">&amp;</span><span class="ident">joint_combiner</span>, <span class="kw-2">&amp;</span><span class="ident">table_id_combiner</span>, <span class="ident">row</span>, <span class="ident">table_id</span>)
+                        <span class="ident">combine_table_entry</span>(<span class="kw-2">&amp;</span><span class="ident">joint_combiner</span>, <span class="kw-2">&amp;</span><span class="ident">table_id_combiner</span>, <span class="ident">row</span>, <span class="kw-2">&amp;</span><span class="ident">table_id</span>)
                     });
 
                     <span class="kw">let</span> <span class="ident">aggreg</span> <span class="op">=</span>
@@ -1712,7 +1721,6 @@
                         <span class="ident">index_evals</span>.<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">g</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>[<span class="ident">i</span>]);
                     }
                 });
-
             <span class="ident">Environment</span> {
                 <span class="ident">constants</span>: <span class="ident">Constants</span> {
                     <span class="ident">alpha</span>,
@@ -1724,7 +1732,7 @@
                 },
                 <span class="ident">witness</span>: <span class="kw-2">&amp;</span><span class="ident">lagrange</span>.<span class="ident">d8</span>.<span class="ident">this</span>.<span class="ident">w</span>,
                 <span class="ident">coefficient</span>: <span class="kw-2">&amp;</span><span class="ident">index</span>.<span class="ident">cs</span>.<span class="ident">coefficients8</span>,
-                <span class="ident">vanishes_on_last_4_rows</span>: <span class="kw-2">&amp;</span><span class="ident">index</span>.<span class="ident">cs</span>.<span class="ident">vanishes_on_last_4_rows</span>,
+                <span class="ident">vanishes_on_last_4_rows</span>: <span class="kw-2">&amp;</span><span class="ident">index</span>.<span class="ident">cs</span>.<span class="ident">precomputations</span>().<span class="ident">vanishes_on_last_4_rows</span>,
                 <span class="ident">z</span>: <span class="kw-2">&amp;</span><span class="ident">lagrange</span>.<span class="ident">d8</span>.<span class="ident">this</span>.<span class="ident">z</span>,
                 <span class="ident">l0_1</span>: <span class="ident">l0_1</span>(<span class="ident">index</span>.<span class="ident">cs</span>.<span class="ident">domain</span>.<span class="ident">d1</span>),
                 <span class="ident">domain</span>: <span class="ident">index</span>.<span class="ident">cs</span>.<span class="ident">domain</span>,
@@ -2512,5 +2520,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="kimchi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (60e50fc1c 2022-04-04)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="kimchi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (52ca603da 2022-04-12)" ></div>
 </body></html>
