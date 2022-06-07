@@ -3,7 +3,9 @@
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../kimchi/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../kimchi/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../kimchi/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+                                <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
+                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -300,6 +302,52 @@
 <span id="295">295</span>
 <span id="296">296</span>
 <span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module implements the data structures of a proof.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::circuits::wires</span>::{<span class="ident">COLUMNS</span>, <span class="ident">PERMUTS</span>};
@@ -309,46 +357,77 @@
 <span class="kw">use</span> <span class="ident">array_init::array_init</span>;
 <span class="kw">use</span> <span class="ident">commitment_dlog</span>::{<span class="ident">commitment::PolyComm</span>, <span class="ident">evaluation_proof::OpeningProof</span>};
 <span class="kw">use</span> <span class="ident">o1_utils</span>::{<span class="ident">types::fields</span>::<span class="kw-2">*</span>, <span class="ident">ExtendedDensePolynomial</span>};
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use</span> <span class="ident">serde_with::serde_as</span>;
 
 <span class="comment">//~ spec:startcode</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">serde_as</span>]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">bound</span>(
+    <span class="ident">serialize</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;o1_utils::serialization::SerdeAs&gt;: serde_with::SerializeAs&lt;Field&gt;&quot;</span>,
+    <span class="ident">deserialize</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;o1_utils::serialization::SerdeAs&gt;: serde_with::DeserializeAs&lt;&#39;de, Field&gt;&quot;</span>
+))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LookupEvaluations</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span> {
     <span class="doccomment">/// sorted lookup table polynomial</span>
+    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;Vec&lt;o1_utils::serialization::SerdeAs&gt;&gt;&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">sorted</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>,
     <span class="doccomment">/// lookup aggregation polynomial</span>
+    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;o1_utils::serialization::SerdeAs&gt;&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">aggreg</span>: <span class="ident">Field</span>,
     <span class="comment">// TODO: May be possible to optimize this away?</span>
     <span class="doccomment">/// lookup table polynomial</span>
+    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;o1_utils::serialization::SerdeAs&gt;&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">table</span>: <span class="ident">Field</span>,
+
+    <span class="doccomment">/// Optionally, a runtime table polynomial.</span>
+    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;Option&lt;Vec&lt;o1_utils::serialization::SerdeAs&gt;&gt;&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">runtime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>,
 }
 
 <span class="comment">// TODO: this should really be vectors here, perhaps create another type for chunked evaluations?</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">serde_as</span>]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">bound</span>(
+    <span class="ident">serialize</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;o1_utils::serialization::SerdeAs&gt;: serde_with::SerializeAs&lt;Field&gt;&quot;</span>,
+    <span class="ident">deserialize</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;o1_utils::serialization::SerdeAs&gt;: serde_with::DeserializeAs&lt;&#39;de, Field&gt;&quot;</span>
+))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ProofEvaluations</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span> {
     <span class="doccomment">/// witness polynomials</span>
+    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;[Vec&lt;o1_utils::serialization::SerdeAs&gt;; COLUMNS]&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">w</span>: [<span class="ident">Field</span>; <span class="ident">COLUMNS</span>],
     <span class="doccomment">/// permutation polynomial</span>
+    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;o1_utils::serialization::SerdeAs&gt;&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">z</span>: <span class="ident">Field</span>,
     <span class="doccomment">/// permutation polynomials</span>
     <span class="doccomment">/// (PERMUTS-1 evaluations because the last permutation is only used in commitment form)</span>
+    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;[Vec&lt;o1_utils::serialization::SerdeAs&gt;; PERMUTS - 1]&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">s</span>: [<span class="ident">Field</span>; <span class="ident">PERMUTS</span> <span class="op">-</span> <span class="number">1</span>],
     <span class="doccomment">/// lookup-related evaluations</span>
     <span class="kw">pub</span> <span class="ident">lookup</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LookupEvaluations</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// evaluation of the generic selector polynomial</span>
+    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;o1_utils::serialization::SerdeAs&gt;&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">generic_selector</span>: <span class="ident">Field</span>,
     <span class="doccomment">/// evaluation of the poseidon selector polynomial</span>
+    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;o1_utils::serialization::SerdeAs&gt;&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">poseidon_selector</span>: <span class="ident">Field</span>,
 }
 
 <span class="doccomment">/// Commitments linked to the lookup feature</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">serde_as</span>]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;G: ark_serialize::CanonicalDeserialize + ark_serialize::CanonicalSerialize&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LookupCommitments</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">AffineCurve</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="ident">sorted</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">aggreg</span>: <span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Optional commitment to concatenated runtime tables</span>
+    <span class="kw">pub</span> <span class="ident">runtime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// All the commitments that the prover creates as part of the proof.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">serde_as</span>]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;G: ark_serialize::CanonicalDeserialize + ark_serialize::CanonicalSerialize&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ProverCommitments</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">AffineCurve</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The commitments to the witness (execution trace)</span>
     <span class="kw">pub</span> <span class="ident">w_comm</span>: [<span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>; <span class="ident">COLUMNS</span>],
@@ -360,8 +439,10 @@
     <span class="kw">pub</span> <span class="ident">lookup</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LookupCommitments</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// The proof that the prover creates from a [ProverIndex] and a `witness`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="doccomment">/// The proof that the prover creates from a [ProverIndex](super::prover_index::ProverIndex) and a `witness`.</span>
+<span class="attribute">#[<span class="ident">serde_as</span>]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;G: ark_serialize::CanonicalDeserialize + ark_serialize::CanonicalSerialize&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ProverProof</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">AffineCurve</span><span class="op">&gt;</span> {
     <span class="doccomment">/// All the polynomial commitments required in the proof</span>
     <span class="kw">pub</span> <span class="ident">commitments</span>: <span class="ident">ProverCommitments</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
@@ -374,12 +455,15 @@
     <span class="kw">pub</span> <span class="ident">evals</span>: [<span class="ident">ProofEvaluations</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>; <span class="number">2</span>],
 
     <span class="doccomment">/// Required evaluation for [Maller&#39;s optimization](https://o1-labs.github.io/mina-book/crypto/plonk/maller_15.html#the-evaluation-of-l)</span>
+    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;o1_utils::serialization::SerdeAs&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">ft_eval1</span>: <span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The public input</span>
+    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;o1_utils::serialization::SerdeAs&gt;&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">public</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The challenges underlying the optional polynomials folded into the proof</span>
+    <span class="attribute">#[<span class="ident">serde_as</span>(<span class="kw">as</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;(Vec&lt;o1_utils::serialization::SerdeAs&gt;, serde_with::Same)&gt;&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">prev_challenges</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">PolyComm</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
 }
 <span class="comment">//~ spec:endcode</span>
@@ -411,6 +495,10 @@
                     .<span class="ident">iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">DensePolynomial::eval_polynomial</span>(<span class="ident">x</span>, <span class="ident">pt</span>))
                     .<span class="ident">collect</span>(),
+                <span class="ident">runtime</span>: <span class="ident">l</span>
+                    .<span class="ident">runtime</span>
+                    .<span class="ident">as_ref</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">rt</span><span class="op">|</span> <span class="ident">DensePolynomial::eval_polynomial</span>(<span class="ident">rt</span>, <span class="ident">pt</span>)),
             }),
             <span class="ident">generic_selector</span>: <span class="ident">DensePolynomial::eval_polynomial</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">generic_selector</span>, <span class="ident">pt</span>),
             <span class="ident">poseidon_selector</span>: <span class="ident">DensePolynomial::eval_polynomial</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">poseidon_selector</span>, <span class="ident">pt</span>),
@@ -435,6 +523,7 @@
         <span class="kw">pub</span> <span class="ident">sorted</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CamlF</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="kw">pub</span> <span class="ident">aggreg</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CamlF</span><span class="op">&gt;</span>,
         <span class="kw">pub</span> <span class="ident">table</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CamlF</span><span class="op">&gt;</span>,
+        <span class="kw">pub</span> <span class="ident">runtime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CamlF</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     }
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">CamlF</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">LookupEvaluations</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CamlLookupEvaluations</span><span class="op">&lt;</span><span class="ident">CamlF</span><span class="op">&gt;</span>
@@ -451,6 +540,7 @@
                     .<span class="ident">collect</span>(),
                 <span class="ident">aggreg</span>: <span class="ident">le</span>.<span class="ident">aggreg</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
                 <span class="ident">table</span>: <span class="ident">le</span>.<span class="ident">table</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
+                <span class="ident">runtime</span>: <span class="ident">le</span>.<span class="ident">runtime</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>()),
             }
         }
     }
@@ -468,6 +558,7 @@
                     .<span class="ident">collect</span>(),
                 <span class="ident">aggreg</span>: <span class="ident">pe</span>.<span class="ident">aggreg</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
                 <span class="ident">table</span>: <span class="ident">pe</span>.<span class="ident">table</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
+                <span class="ident">runtime</span>: <span class="ident">pe</span>.<span class="ident">runtime</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>()),
             }
         }
     }
@@ -506,6 +597,8 @@
         ),
         <span class="kw">pub</span> <span class="ident">generic_selector</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CamlF</span><span class="op">&gt;</span>,
         <span class="kw">pub</span> <span class="ident">poseidon_selector</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CamlF</span><span class="op">&gt;</span>,
+
+        <span class="kw">pub</span> <span class="ident">lookup</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CamlLookupEvaluations</span><span class="op">&lt;</span><span class="ident">CamlF</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     }
 
     <span class="comment">//</span>
@@ -550,6 +643,7 @@
                 <span class="ident">s</span>,
                 <span class="ident">generic_selector</span>: <span class="ident">pe</span>.<span class="ident">generic_selector</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
                 <span class="ident">poseidon_selector</span>: <span class="ident">pe</span>.<span class="ident">poseidon_selector</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
+                <span class="ident">lookup</span>: <span class="ident">pe</span>.<span class="ident">lookup</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),
             }
         }
     }
@@ -590,13 +684,13 @@
                 <span class="ident">w</span>,
                 <span class="ident">z</span>: <span class="ident">cpe</span>.<span class="ident">z</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
                 <span class="ident">s</span>,
-                <span class="ident">lookup</span>: <span class="prelude-val">None</span>,
                 <span class="ident">generic_selector</span>: <span class="ident">cpe</span>.<span class="ident">generic_selector</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
                 <span class="ident">poseidon_selector</span>: <span class="ident">cpe</span>.<span class="ident">poseidon_selector</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
+                <span class="ident">lookup</span>: <span class="ident">cpe</span>.<span class="ident">lookup</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),
             }
         }
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="kimchi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (4dd8b420c 2022-05-01)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="kimchi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (50b00252a 2022-06-06)" ></div>
 </body></html>
