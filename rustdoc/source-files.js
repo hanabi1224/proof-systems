@@ -1,6 +1,7 @@
 var sourcesIndex = {};
 sourcesIndex["cairo"] = {"name":"","files":["flags.rs","helper.rs","lib.rs","memory.rs","runner.rs","word.rs"]};
-sourcesIndex["commitment_dlog"] = {"name":"","files":["chunked.rs","combine.rs","commitment.rs","evaluation_proof.rs","lib.rs","srs.rs"]};
+sourcesIndex["circuit_construction"] = {"name":"","files":["constants.rs","lib.rs","prover.rs","writer.rs"]};
+sourcesIndex["commitment_dlog"] = {"name":"","files":["chunked.rs","combine.rs","commitment.rs","error.rs","evaluation_proof.rs","lib.rs","srs.rs"]};
 sourcesIndex["export_test_vectors"] = {"name":"","files":["main.rs","vectors.rs"]};
 sourcesIndex["flamegraph"] = {"name":"","files":["flamegraph.rs"]};
 sourcesIndex["groupmap"] = {"name":"","files":["lib.rs"]};
@@ -9,7 +10,7 @@ sourcesIndex["kimchi_visu"] = {"name":"","files":["lib.rs","witness.rs"]};
 sourcesIndex["mina_curves"] = {"name":"","dirs":[{"name":"pasta","dirs":[{"name":"curves","files":["mod.rs","pallas.rs","vesta.rs"]},{"name":"fields","files":["fp.rs","fq.rs","mod.rs"]}],"files":["mod.rs"]}],"files":["lib.rs"]};
 sourcesIndex["mina_hasher"] = {"name":"","files":["lib.rs","poseidon.rs","roinput.rs"]};
 sourcesIndex["mina_signer"] = {"name":"","files":["keypair.rs","lib.rs","pubkey.rs","schnorr.rs","seckey.rs","signature.rs"]};
-sourcesIndex["o1_utils"] = {"name":"","files":["adjacent_pairs.rs","chunked_polynomial.rs","dense_polynomial.rs","evaluations.rs","field_helpers.rs","hasher.rs","lib.rs","math.rs","serialization.rs","types.rs"]};
+sourcesIndex["o1_utils"] = {"name":"","files":["adjacent_pairs.rs","chunked_polynomial.rs","dense_polynomial.rs","evaluations.rs","field_helpers.rs","hasher.rs","lib.rs","math.rs","serialization.rs"]};
 sourcesIndex["ocaml_derive"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["ocaml_gen"] = {"name":"","files":["conv.rs","lib.rs"]};
 sourcesIndex["oracle"] = {"name":"","dirs":[{"name":"pasta","files":["fp_kimchi.rs","fp_legacy.rs","fq_kimchi.rs","fq_legacy.rs","mod.rs"]}],"files":["constants.rs","lib.rs","permutation.rs","poseidon.rs","sponge.rs"]};
