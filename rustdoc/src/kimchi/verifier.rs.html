@@ -962,6 +962,9 @@
 <span id="956">956</span>
 <span id="957">957</span>
 <span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module implements zk-proof batch verifier functionality.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1463,9 +1466,12 @@
             <span class="ident">unshifted</span>: <span class="macro">vec!</span>[<span class="kw-2">*</span><span class="ident">c</span>],
             <span class="ident">shifted</span>: <span class="prelude-val">None</span>,
         })
-        .<span class="ident">take</span>(<span class="ident">proof</span>.<span class="ident">public</span>.<span class="ident">len</span>())
+        .<span class="ident">take</span>(<span class="ident">index</span>.<span class="ident">public</span>)
         .<span class="ident">collect</span>();
     <span class="kw">let</span> <span class="ident">com_ref</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">com</span>.<span class="ident">iter</span>().<span class="ident">collect</span>();
+    <span class="kw">if</span> <span class="ident">proof</span>.<span class="ident">public</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">index</span>.<span class="ident">public</span> {
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">VerifyError::IncorrectPubicInputLength</span>(<span class="ident">index</span>.<span class="ident">public</span>));
+    }
     <span class="kw">let</span> <span class="ident">elm</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">proof</span>.<span class="ident">public</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="op">-</span><span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">collect</span>();
     <span class="kw">let</span> <span class="ident">p_comm</span> <span class="op">=</span> <span class="ident">PolyComm</span>::<span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="ident">::multi_scalar_mul</span>(<span class="kw-2">&amp;</span><span class="ident">com_ref</span>, <span class="kw-2">&amp;</span><span class="ident">elm</span>);
 
@@ -1921,5 +1927,5 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="kimchi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (c80c4b8fd 2022-06-26)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="kimchi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (ddcbba036 2022-06-29)" ></div>
 </body></html>

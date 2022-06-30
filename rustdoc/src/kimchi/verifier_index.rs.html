@@ -326,6 +326,9 @@
 <span id="320">320</span>
 <span id="321">321</span>
 <span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module implements the verifier index as [VerifierIndex].</span>
 <span class="doccomment">//! You can derive this struct from the [ProverIndex] struct.</span>
 
@@ -394,6 +397,8 @@
     <span class="doccomment">/// polynomial commitment keys</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
     <span class="kw">pub</span> <span class="ident">srs</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">SRS</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// number of public inputs</span>
+    <span class="kw">pub</span> <span class="ident">public</span>: <span class="ident">usize</span>,
 
     <span class="comment">// index polynomial commitments</span>
     <span class="doccomment">/// permutation commitment array</span>
@@ -505,6 +510,7 @@
             <span class="ident">max_poly_size</span>: <span class="self">self</span>.<span class="ident">max_poly_size</span>,
             <span class="ident">max_quot_size</span>: <span class="self">self</span>.<span class="ident">max_quot_size</span>,
             <span class="ident">powers_of_alpha</span>: <span class="self">self</span>.<span class="ident">powers_of_alpha</span>.<span class="ident">clone</span>(),
+            <span class="ident">public</span>: <span class="self">self</span>.<span class="ident">cs</span>.<span class="ident">public</span>,
             <span class="ident">srs</span>: {
                 <span class="kw">let</span> <span class="ident">cell</span> <span class="op">=</span> <span class="ident">OnceCell::new</span>();
                 <span class="ident">cell</span>.<span class="ident">set</span>(<span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">srs</span>)).<span class="ident">unwrap</span>();
@@ -649,5 +655,5 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="kimchi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (c80c4b8fd 2022-06-26)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="kimchi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (ddcbba036 2022-06-29)" ></div>
 </body></html>
