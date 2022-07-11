@@ -9,7 +9,7 @@ use mina_curves::pasta::Fp;
 use oracle::{
     constants::{PlonkSpongeConstantsKimchi, PlonkSpongeConstantsLegacy, SpongeConstants},
     pasta::{fp_kimchi_params, fp_legacy_params},
-    poseidon::{ArithmeticSponge, ArithmeticSpongeParams, Sponge, SpongeState},
+    poseidon::{ArithmeticSponge, ArithmeticSpongeParams, Sponge},
 };
 
 use super::{domain_prefix_to_field, Hashable, Hasher};
@@ -22,8 +22,6 @@ use super::{domain_prefix_to_field, Hashable, Hasher};
 //  a backup of the initialized sponge state for efficient reuse.
 pub struct Poseidon<'a, SC: SpongeConstants, H: Hashable> {
     sponge: ArithmeticSponge<'a, Fp, SC>,
-    sponge_state: SpongeState,
-    state: Vec<Fp>,
     phantom: PhantomData<H>,
 }
 
@@ -31,8 +29,6 @@ impl<'a, SC: SpongeConstants, H: Hashable> Poseidon<'a, SC, H> {
     fn new(domain_param: H::D, sponge_params: &'a ArithmeticSpongeParams<Fp>) -> Self {
         let mut poseidon = Poseidon::<SC, H> {
             sponge: ArithmeticSponge::<Fp, SC>::new(sponge_params),
-            sponge_state: SpongeState::Absorbed(0),
-            state: vec![],
             phantom: PhantomData,
         };
 
@@ -62,14 +58,6 @@ impl<'a, SC: SpongeConstants, H: Hashable> Hasher<H> for Poseidon<'a, SC, H>
 where
     H::D: DomainParameter,
 {
-    fn reset(&mut self) -> &mut dyn Hasher<H> {
-        // Efficient reset
-        self.sponge.sponge_state = self.sponge_state.clone();
-        self.sponge.state = self.state.clone();
-
-        self
-    }
-
     fn init(&mut self, domain_param: H::D) -> &mut dyn Hasher<H> {
         // Set sponge initial state and save it so the hasher context can be reused efficiently
         // N.B. Mina sets the sponge's initial state by hashing the input type's domain bytes
@@ -80,10 +68,6 @@ where
                 .absorb(&[domain_prefix_to_field::<Fp>(domain_string)]);
             self.sponge.squeeze();
         }
-
-        // Save initial state for efficient reset
-        self.sponge_state = self.sponge.sponge_state.clone();
-        self.state = self.sponge.state.clone();
 
         self
     }

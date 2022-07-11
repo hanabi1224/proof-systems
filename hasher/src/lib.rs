@@ -127,9 +127,6 @@ pub trait Hasher<H: Hashable> {
     /// generated from `H::domain_string(domain_param)`
     fn init(&mut self, domain_param: H::D) -> &mut dyn Hasher<H>;
 
-    /// Restore the initial state that was set most recently
-    fn reset(&mut self) -> &mut dyn Hasher<H>;
-
     /// Consume hash `input`
     fn update(&mut self, input: &H) -> &mut dyn Hasher<H>;
 
@@ -138,20 +135,15 @@ pub trait Hasher<H: Hashable> {
 
     /// Hash input and obtain result output
     fn hash(&mut self, input: &H) -> Fp {
-        self.reset();
         self.update(input);
-        let output = self.digest();
-        self.reset();
-        output
+        self.digest()
     }
 
     /// Initialize state, hash input and obtain result output
     fn init_and_hash(&mut self, domain_param: H::D, input: &H) -> Fp {
         self.init(domain_param);
         self.update(input);
-        let output = self.digest();
-        self.reset();
-        output
+        self.digest()
     }
 }
 
