@@ -1,3 +1,0 @@
-(function() {var implementors = {
-"mina_curves":[["impl FftParameters for <a class=\"struct\" href=\"mina_curves/pasta/fp/struct.FpParameters.html\" title=\"struct mina_curves::pasta::fp::FpParameters\">FpParameters</a>"],["impl FftParameters for <a class=\"struct\" href=\"mina_curves/pasta/fq/struct.FqParameters.html\" title=\"struct mina_curves::pasta::fq::FqParameters\">FqParameters</a>"]]
-};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
